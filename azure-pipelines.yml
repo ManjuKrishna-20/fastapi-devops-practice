@@ -6,17 +6,36 @@ pool:
 
 steps:
 
+# Step 1: Checkout repository
+- checkout: self
+
+# Step 2: Install Python
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '3.10'
-  displayName: "Use Python"
+  displayName: 'Use Python 3.10'
 
+# Step 3: Upgrade pip
 - script: |
     python -m pip install --upgrade pip
-    pip install poetry
-    poetry install
-  displayName: "Install dependencies"
+  displayName: 'Upgrade pip'
 
+# Step 4: Install Poetry
 - script: |
-    echo "Pipeline executed successfully"
-  displayName: "Run Build"
+    pip install poetry
+  displayName: 'Install Poetry'
+
+# Step 5: Install project dependencies
+- script: |
+    poetry install
+  displayName: 'Install dependencies'
+
+# Step 6: Run tests
+- script: |
+    poetry run pytest
+  displayName: 'Run tests'
+
+# Step 7: Build success message
+- script: |
+    echo "Pipeline completed successfully"
+  displayName: 'Build complete'
