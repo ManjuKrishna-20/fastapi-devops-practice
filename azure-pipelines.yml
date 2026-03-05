@@ -5,16 +5,18 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-
 - checkout: self
 
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '3.10'
-  displayName: 'Use Python'
+  displayName: 'Install Python'
 
 - script: |
     python -m pip install --upgrade pip
+  displayName: 'Upgrade pip'
+
+- script: |
     pip install poetry
   displayName: 'Install Poetry'
 
@@ -23,5 +25,5 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
-    echo "Pipeline running successfully"
+    echo "Pipeline executed successfully"
   displayName: 'Run pipeline'
