@@ -10,16 +10,23 @@ steps:
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '3.10'
+  displayName: 'Use Python 3.10'
 
 - script: |
     python -m pip install --upgrade pip
     pip install poetry
-  displayName: Install Poetry
+  displayName: 'Install Poetry'
 
 - script: |
-    poetry install
-  displayName: Install dependencies
+    poetry config virtualenvs.create false
+    poetry install --no-interaction
+  displayName: 'Install dependencies'
 
 - script: |
-    poetry run pytest
-  displayName: Run tests
+    poetry run alembic upgrade head
+  displayName: 'Run DB Migrations'
+  continueOnError: true
+
+- script: |
+    poetry run pytest tests/ -v
+  displayName: 'Run tests'
