@@ -5,7 +5,7 @@ on: push
 jobs:
   checks:
     name: Lint and test
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres:11.5-alpine
@@ -17,33 +17,39 @@ jobs:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
-      - uses: actions/checkout@v1
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v1
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.7
+          python-version: '3.10'
+
       - name: Install dependencies
         run: |
           pip install poetry
-          poetry config settings.virtualenvs.create false
-          poetry install
-      - name: Lint with wps, mypy and style linters
+          poetry config virtualenvs.create false
+          poetry install --no-interaction
+
+      - name: Lint
         run: ./scripts/lint
-      - name: run tests with pytest
+
+      - name: Run tests
         env:
           SECRET_KEY: secret_key
           DB_CONNECTION: postgres://postgres:postgres@localhost/postgres
         run: |
           alembic upgrade head
           USE_LOCAL_DB_FOR_TEST=False ./scripts/test --cov-report=xml --cov-fail-under=100
+
       - name: Upload coverage to Codecov
         run: bash <(curl -s https://codecov.io/bash) -t $TOKEN -B $REF
         env:
           TOKEN: ${{ secrets.CODECOV_TOKEN }}
           REF: ${{ github.ref }}
+
   postman:
     name: Postman tests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres:11.5-alpine
@@ -55,20 +61,23 @@ jobs:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
-      - uses: actions/checkout@v1
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v1
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.7
+          python-version: '3.10'
+
       - name: Install dependencies
         run: |
           pip install poetry
-          poetry config settings.virtualenvs.create false
-          poetry install
-      - name: Run newman and test service
+          poetry config virtualenvs.create false
+          poetry install --no-interaction
+
+      - name: Run Postman tests
         env:
           SECRET_KEY: secret_key
           DB_CONNECTION: postgres://postgres:postgres@localhost/postgres
         run: |
           alembic upgrade head && uvicorn app.main:app &
-          USE_LOCAL_DB_FOR_TEST=False APIURL=http://localhost:8000/api ./postman/run-api-tests.sh
+          USE_LOCAL_DB_FOR_TEST=False APIURL=http://localhost:8000/api ./scripts/test
