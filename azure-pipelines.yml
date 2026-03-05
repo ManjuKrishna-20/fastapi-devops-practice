@@ -10,20 +10,16 @@ steps:
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '3.10'
-  displayName: 'Install Python'
 
 - script: |
     python -m pip install --upgrade pip
-  displayName: 'Upgrade pip'
-
-- script: |
     pip install poetry
-  displayName: 'Install Poetry'
+  displayName: Install Poetry
 
 - script: |
     poetry install
-  displayName: 'Install dependencies'
+  displayName: Install dependencies
 
 - script: |
-    echo "Pipeline executed successfully"
-  displayName: 'Run pipeline'
+    poetry run pytest
+  displayName: Run tests
