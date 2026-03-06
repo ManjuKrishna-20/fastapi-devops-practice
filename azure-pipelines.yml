@@ -2,20 +2,21 @@ trigger:
 - main
 
 pool:
-  name: Default
+  vmImage: 'ubuntu-latest'
 
 steps:
 
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '3.9'
-  displayName: 'Use Python 3.9'
+  displayName: "Use Python"
 
-- script: pip install poetry
-  displayName: 'Install Poetry'
+- script: |
+    python -m pip install --upgrade pip
+    pip install poetry
+    poetry install
+  displayName: "Install Dependencies"
 
-- script: poetry install --no-root
-  displayName: 'Install Dependencies'
-
-- script: poetry run pytest
-  displayName: 'Run Tests'
+- script: |
+    poetry run pytest
+  displayName: "Run Tests"
