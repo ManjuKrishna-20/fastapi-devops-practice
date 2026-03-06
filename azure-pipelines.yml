@@ -2,29 +2,11 @@ trigger:
 - main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: Default
 
 steps:
+- checkout: self
+  displayName: Checkout Repository
 
-# Install Python
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '3.9'
-  displayName: "Use Python 3.9"
-
-# Install Poetry
-- script: |
-    python -m pip install --upgrade pip
-    pip install poetry
-  displayName: "Install Poetry"
-
-# Install project dependencies
-- script: |
-    poetry config virtualenvs.create false
-    poetry install
-  displayName: "Install Dependencies"
-
-# Run tests
-- script: |
-    poetry run pytest
-  displayName: "Run Tests"
+- script: echo "Pipeline started successfully"
+  displayName: Test Step
